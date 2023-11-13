@@ -1,18 +1,29 @@
 <template>
-    <div class="home">
-        <img alt="Vue logo" src="../assets/logo.png" />
-        <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <Header style="position: fixed; width: 100%"></Header>
+    <div class="common-layout">
+        <el-container>
+            <el-main>main</el-main>
+            <el-footer>Footer</el-footer>
+        </el-container>
     </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import { defineComponent } from "vue";
+import Header from "@/components/Header.vue";
 
-@Options({
-    components: {
-        HelloWorld,
+export default defineComponent({
+    name: "HomeView",
+    // eslint-disable-next-line
+    components: { Header },
+    setup() {
+        return 0;
     },
-})
-export default class HomeView extends Vue {}
+});
 </script>
+
+<style>
+.common-layout {
+    padding-top: 80px;
+}
+</style>
