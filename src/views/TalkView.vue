@@ -142,7 +142,7 @@ export default {
         const initWebSocket = () => {
             if ("WebSocket" in window) {
                 websocket.value = new WebSocket(
-                    "ws://localhost:1211/websocket/" + userid.value,
+                    "ws://193.111.30.89:1211/websocket/" + userid.value,
                 );
                 websocket.value.onerror = () => {
                     setWelcome("系统错误");
