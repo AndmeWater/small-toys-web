@@ -8,35 +8,37 @@
                 {{ message }}
             </li>
         </ul>
-        <p>
-            用户名：
-            <el-input
-                v-if="inputVisible"
-                ref="InputRef"
-                v-model="inputValue"
-                class="ml-1 w-20"
-                size="small"
-                autofocus
-                :style="{ width: `${buttonweight}px` }"
-                @keyup.enter="handleInputConfirm()"
-                @blur="handleInputConfirm()"></el-input>
-            <el-button
-                v-else
-                ref="myButtonRef"
-                class="button-new-tag ml-1"
-                size="small"
-                style="height: 21px"
-                @click="showInput">
-                {{ userid }}
-            </el-button>
-            <span>当前在线人数:{{ num }}</span>
-        </p>
-        <div style="width: 100%; text-align: center">
-            <input v-model="messageInput" type="text" @keyup.enter="send" />
-            <button @click="send" style="margin-left: 5px">发送</button>
-            <button @click="closeWebSocket" style="margin-left: 5px">
-                关闭
-            </button>
+        <div class="srk">
+            <p>
+                用户名：
+                <el-input
+                    v-if="inputVisible"
+                    ref="InputRef"
+                    v-model="inputValue"
+                    class="ml-1 w-20"
+                    size="small"
+                    autofocus
+                    :style="{ width: `${buttonweight}px` }"
+                    @keyup.enter="handleInputConfirm()"
+                    @blur="handleInputConfirm()"></el-input>
+                <el-button
+                    v-else
+                    ref="myButtonRef"
+                    class="button-new-tag ml-1"
+                    size="small"
+                    style="height: 21px"
+                    @click="showInput">
+                    {{ userid }}
+                </el-button>
+                <span>当前在线人数:{{ num }}</span>
+            </p>
+            <div style="width: 100%; text-align: center">
+                <input v-model="messageInput" type="text" @keyup.enter="send" />
+                <button @click="send" style="margin-left: 5px">发送</button>
+                <button @click="closeWebSocket" style="margin-left: 5px">
+                    {{ loginOrExit }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -56,6 +58,7 @@ export default {
         const InputRef = ref(null);
         const myButtonRef = ref(null);
         const buttonweight = ref(0);
+        const loginOrExit = ref("关闭");
 
         const setMessageInnerHTML = (innerHTML) => {
             const userid = innerHTML.userid;
@@ -74,15 +77,33 @@ export default {
         };
 
         const closeWebSocket = () => {
-            websocket.value.close();
+            if (
+                websocket.value !== undefined &&
+                websocket.value.readyState === WebSocket.OPEN
+            ) {
+                websocket.value.close();
+                num.value -= 1;
+                loginOrExit.value = "连接";
+            } else {
+                initWebSocket();
+                loginOrExit.value = "关闭";
+            }
         };
 
         const send = () => {
-            if (messageInput.value !== "") {
-                websocket.value.send(messageInput.value);
+            if (
+                websocket.value !== undefined &&
+                websocket.value.readyState === WebSocket.OPEN
+            ) {
+                if (messageInput.value !== "") {
+                    websocket.value.send(messageInput.value);
+                } else {
+                    setWelcome("发送不能为空！");
+                }
             } else {
-                setWelcome("发送不能为空！");
+                setWelcome("您已离开房间，请重新连接！");
             }
+
             messageInput.value = "";
         };
         const load = () => {
@@ -121,7 +142,7 @@ export default {
         const initWebSocket = () => {
             if ("WebSocket" in window) {
                 websocket.value = new WebSocket(
-                    "ws://193.111.30.89:1211/websocket/" + userid.value,
+                    "ws://localhost:1211/websocket/" + userid.value,
                 );
                 websocket.value.onerror = () => {
                     setWelcome("系统错误");
@@ -169,6 +190,7 @@ export default {
             handleInputConfirm,
             myButtonRef,
             buttonweight,
+            loginOrExit,
         };
     },
     mounted() {
@@ -198,7 +220,7 @@ export default {
     justify-content: center;
     height: 50px;
     background: var(--el-color-primary-light-9);
-    margin: 10px;
+    margin: auto;
     color: var(--el-color-primary);
 }
 .infinite-list .infinite-list-item + .list-item {
@@ -210,6 +232,13 @@ span {
 }
 
 @media (max-width: 600px) {
+    .talkbox {
+        margin: 0vw;
+    }
+    .srk {
+        width: 100vw;
+        margin-left: auto;
+    }
     .infinite-list {
         height: 500px;
     }
@@ -218,14 +247,11 @@ span {
         height: 10vw; /* Set your mobile height in vw units */
     }
     .infinite-list {
-        width: 40vw;
+        width: 100vw;
     }
 
     .infinite-list .infinite-list-item + .list-item {
         margin-top: 1vw; /* Set your mobile margin in vw units */
-    }
-    span {
-        float: left;
     }
 }
 </style>

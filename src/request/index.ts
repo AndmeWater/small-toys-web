@@ -2,7 +2,7 @@ import axios from "axios";
 axios.defaults.baseURL = "/api";
 //创建axios示例
 const service = axios.create({
-    baseURL: "http://193.111.30.89:1211",
+    baseURL: "http://localhost:1211",
     timeout: 5000,
     headers: {
         "Content-Type": "application/json;charset=utf-8",
